@@ -21,10 +21,13 @@ public class Hacker : MonoBehaviour
 
     // Current Game State
     public int level;
+    private enum Screen { MainMenu, Password, Win };
+    private Screen currentScreen;
 
     // Start is called before the first frame update
     void Start()
     {
+        this.currentScreen = Screen.MainMenu;
         writeBanner();
         showMainMenu(modeList[0], modeList[1], modeList[2]);
     }
@@ -51,7 +54,7 @@ public class Hacker : MonoBehaviour
 
     void OnUserInput(string input)
     {
-        if (input == "007")
+        if (input == "007" && currentScreen == Screen.MainMenu)
         {
             Terminal.WriteLine("Please select a level Mr. Bond.");
         }
@@ -64,13 +67,14 @@ public class Hacker : MonoBehaviour
             try
             {
                 int selection = Convert.ToInt32(input);
-                if (selection > modeList.Length || selection <= 0)
+                if ((selection > modeList.Length || selection <= 0) && currentScreen == Screen.MainMenu)
                 {
                     Terminal.WriteLine("Error 001: " + input + " is OutOfBounds");
                 }
                 else
                 {
                     this.level = selection;
+                    this.currentScreen = Screen.Password;
                 }
             }
             catch (FormatException fe)
@@ -79,6 +83,5 @@ public class Hacker : MonoBehaviour
                 print(fe.ToString());
             }
         }
-
     }
 }
