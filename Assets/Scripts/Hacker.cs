@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 /*
@@ -13,26 +14,27 @@ using UnityEngine;
 public class Hacker : MonoBehaviour
 {
 
-    private string op1 = "Huddersfield University"; // eays mode
-    private string op2 = "Huddersfield Town Hall"; // medium mode
-    private string op3 = "MI5 - Hidden Terminal"; // hard mode
+    private string[] modeList = {"Huddersfield University", // easy mode
+                                 "Huddersfield Town Hall", // medium mode
+                                 "MI5 - Hidden Terminal" }; // hard mode
 
     // Start is called before the first frame update
     void Start()
     {
         writeBanner();
-        writeInstruction(this.op1, this.op2, this.op3);
+        showMainMenu(modeList[0], modeList[1], modeList[2]);
     }
 
-    private void writeBanner()
+    void writeBanner()
     {
+        Terminal.ClearScreen();
         Terminal.WriteLine("###############################");
         Terminal.WriteLine("######## Hax0r OS : 2019 ########");
         Terminal.WriteLine("###############################");
         Terminal.WriteLine("");
     }
 
-    private void writeInstruction(string op1, string op2, string op3)
+    void showMainMenu(string op1, string op2, string op3)
     {
         Terminal.WriteLine("Wireless Connections:");
         Terminal.WriteLine("");
@@ -43,9 +45,25 @@ public class Hacker : MonoBehaviour
         Terminal.WriteLine("Enter your selection:");
     }
 
-    // Update is called once per frame
-    void Update()
+    void OnUserInput(string input)
     {
-        
+        try
+        {
+            int selection = Convert.ToInt32(input);
+
+            if(selection > modeList.Length || selection <= 0)
+            {
+                Terminal.WriteLine("Error 001: " + input + " is OutOfBounds");
+            }
+            else
+            {
+                
+            }
+        }
+        catch(FormatException fe)
+        {
+            Terminal.WriteLine("Invalid Input!");
+            print(fe.ToString());
+        }
     }
 }
