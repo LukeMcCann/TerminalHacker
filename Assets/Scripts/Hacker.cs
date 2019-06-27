@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using System.Linq;
 
 /*
  * Terminal Hacker Game
@@ -19,14 +20,21 @@ public class Hacker : MonoBehaviour
                                  "Huddersfield Town Hall", // medium mode
                                  "MI5 - Hidden Terminal" }; // hard mode
 
+    private string[] easyPasswords = { "module" };
+    private string[] midPasswords = { "mayoral" };
+    private string[] hardPasswords = { "anthropoid" };
+
     // Current Game State
     public int level;
+    private string answer;
+    private string location;
     private enum Screen { MainMenu, Password, Win };
     private Screen currentScreen;
 
     // Start is called before the first frame update
     void Start()
     {
+        Terminal.ClearScreen();
         this.currentScreen = Screen.MainMenu;
         WriteBanner();
         ShowMainMenu(modeList[0], modeList[1], modeList[2]);
@@ -54,18 +62,27 @@ public class Hacker : MonoBehaviour
 
     void OnUserInput(string input)
     {
-        if (input == "007" && currentScreen == Screen.MainMenu) // Easter egg only for MainMenu
-        {
-            Terminal.WriteLine("Please select a level Mr. Bond.");
-        }
-        else if(input.ToLower() == "menu") // Always possible to access menu
+        if(input.ToLower() == "menu") // Always possible to access menu
         {
             Start();
         }
-        else
+
+        if(currentScreen == Screen.MainMenu && input.ToLower() != "menu")
         {
-            RunMainMenu(input);
+            if (input == "007") // Easter egg only for MainMenu
+            {
+                Terminal.WriteLine("Please select a level Mr. Bond.");
+            }
+            else
+            {
+                RunMainMenu(input);
+            }
         }
+        else if(currentScreen == Screen.Password)
+        {
+            RunPasswordValidation(input);
+        }
+
     }
 
     void RunMainMenu(string input)
@@ -103,13 +120,109 @@ public class Hacker : MonoBehaviour
 
     void RunPasswordGuess(int input)
     {
+        this.location = modeList[input - 1];
         if(currentScreen == Screen.Password)
         {
+            SetAnswer();
+
             Terminal.ClearScreen();
-            Terminal.WriteLine("Welcome to " + modeList[input-1] + "!");
+            Terminal.WriteLine("Welcome to " + location + "!");
             Terminal.WriteLine("");
-            Terminal.WriteLine("Hint: ");
+
+            Terminal.WriteLine("Hint: " + Scramble(this.answer));
             Terminal.WriteLine("Please enter your password: ");
         }
     }
+
+    void SetAnswer()
+    {
+        System.Random rnd = new System.Random();
+
+        if (this.level == 1)
+        {
+            this.answer = easyPasswords[0];
+        }
+        else if (this.level == 2)
+        {
+            this.answer = midPasswords[0];
+        }
+        else
+        {
+            this.answer = hardPasswords[0];
+        }
+    }
+
+    public string Scramble(string word)
+    {
+        char[] chars = new char[word.Length];
+        System.Random rand = new System.Random(10000);
+
+        int index = 0;
+
+        while (word.Length > 0)
+        {
+            // Get a random number between 0 and the length of the word.
+            int next = rand.Next(0, word.Length - 1);
+
+            // Take the character from the random position and add to our char array.
+            chars[index] = word[next];
+
+            // Remove the character from the word.
+            word = word.Substring(0, next) + word.Substring(next + 1);
+
+            ++index;
+        }
+
+        return new String(chars);
+    }
+
+    void RunPasswordValidation(string input)
+    {
+        try
+        {
+            if(input == this.answer)
+            {
+                currentScreen = Screen.Win;
+                RunWinScreen();
+            }
+            else
+            {
+                RunLoseScreen();
+            }
+        }
+        catch (Exception e)
+        {
+            print(e.ToString());
+        }
+    }
+
+    void RunWinScreen()
+    {
+        if(currentScreen == Screen.Win)
+        {
+            Terminal.WriteLine("Logging in...");
+            System.Threading.Thread.Sleep(300);
+            Terminal.ClearScreen();
+
+            Terminal.WriteLine(this.location + " - Admin Terminal");
+            System.Threading.Thread.Sleep(1000);
+            Terminal.WriteLine("Accessing remote data...");
+            System.Threading.Thread.Sleep(1000);
+            Terminal.WriteLine("===================>");
+            System.Threading.Thread.Sleep(2000);
+            Terminal.WriteLine("Downloading drives...");
+            System.Threading.Thread.Sleep(1500);
+            Terminal.WriteLine("Releasing records...");
+            System.Threading.Thread.Sleep(1000);
+            Terminal.WriteLine("Done!");
+        }
+    }
+
+    void RunLoseScreen()
+    {
+        Terminal.WriteLine("Logging in...");
+        System.Threading.Thread.Sleep(300);
+        Terminal.WriteLine("Password Incorrect! Please try again!");
+    }
+ 
 }
