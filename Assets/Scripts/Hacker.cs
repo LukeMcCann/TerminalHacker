@@ -28,11 +28,11 @@ public class Hacker : MonoBehaviour
     void Start()
     {
         this.currentScreen = Screen.MainMenu;
-        writeBanner();
-        showMainMenu(modeList[0], modeList[1], modeList[2]);
+        WriteBanner();
+        ShowMainMenu(modeList[0], modeList[1], modeList[2]);
     }
 
-    void writeBanner()
+    void WriteBanner()
     {
         Terminal.ClearScreen();
         Terminal.WriteLine("###############################");
@@ -41,7 +41,7 @@ public class Hacker : MonoBehaviour
         Terminal.WriteLine("");
     }
 
-    void showMainMenu(string op1, string op2, string op3)
+    void ShowMainMenu(string op1, string op2, string op3)
     {
         Terminal.WriteLine("Wireless Connections:");
         Terminal.WriteLine("");
@@ -54,34 +54,62 @@ public class Hacker : MonoBehaviour
 
     void OnUserInput(string input)
     {
-        if (input == "007" && currentScreen == Screen.MainMenu)
+        if (input == "007" && currentScreen == Screen.MainMenu) // Easter egg only for MainMenu
         {
             Terminal.WriteLine("Please select a level Mr. Bond.");
         }
-        else if(input.ToLower() == "menu")
+        else if(input.ToLower() == "menu") // Always possible to access menu
         {
             Start();
         }
         else
         {
-            try
+            RunMainMenu(input);
+        }
+    }
+
+    void RunMainMenu(string input)
+    {
+        try
+        {
+            int selection = Convert.ToInt32(input);
+            if ((selection > modeList.Length || selection <= 0) && currentScreen == Screen.MainMenu)
             {
-                int selection = Convert.ToInt32(input);
-                if ((selection > modeList.Length || selection <= 0) && currentScreen == Screen.MainMenu)
-                {
-                    Terminal.WriteLine("Error 001: " + input + " is OutOfBounds");
-                }
-                else
-                {
-                    this.level = selection;
-                    this.currentScreen = Screen.Password;
-                }
+                Error001(selection);
             }
-            catch (FormatException fe)
+            else
             {
-                Terminal.WriteLine("Invalid Input!");
-                print(fe.ToString());
+                StartLevel(selection);
             }
+        }
+        catch (FormatException fe)
+        {
+            Terminal.WriteLine("Invalid Input!");
+            print(fe.ToString());
+        }
+    }
+
+    void Error001(int input)
+    {
+        Terminal.WriteLine("Error 001: " + input + " is OutOfBounds");
+    }
+
+    void StartLevel(int input)
+    {
+        this.level = input;
+        this.currentScreen = Screen.Password;
+        RunPasswordGuess(input);
+    }
+
+    void RunPasswordGuess(int input)
+    {
+        if(currentScreen == Screen.Password)
+        {
+            Terminal.ClearScreen();
+            Terminal.WriteLine("Welcome to " + modeList[input-1] + "!");
+            Terminal.WriteLine("");
+            Terminal.WriteLine("Hint: ");
+            Terminal.WriteLine("Please enter your password: ");
         }
     }
 }
