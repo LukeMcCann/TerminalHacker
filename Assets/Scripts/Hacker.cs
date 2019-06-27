@@ -9,7 +9,8 @@ using UnityEngine;
  * Author: Luke McCann
  * 
  * It is not recommended to hard code anything, however as this is just a short exercise to get used
- * to Unity the options are hard coded in a conevenient location for changing. 
+ * to Unity the options are hard coded in a conevenient location for changing. In a real project
+ * it is better to utilise getters and setters. 
  */
 public class Hacker : MonoBehaviour
 {
@@ -17,6 +18,9 @@ public class Hacker : MonoBehaviour
     private string[] modeList = {"Huddersfield University", // easy mode
                                  "Huddersfield Town Hall", // medium mode
                                  "MI5 - Hidden Terminal" }; // hard mode
+
+    // Current Game State
+    public int level;
 
     // Start is called before the first frame update
     void Start()
@@ -47,23 +51,34 @@ public class Hacker : MonoBehaviour
 
     void OnUserInput(string input)
     {
-        try
+        if (input == "007")
         {
-            int selection = Convert.ToInt32(input);
+            Terminal.WriteLine("Please select a level Mr. Bond.");
+        }
+        else if(input.ToLower() == "menu")
+        {
+            Start();
+        }
+        else
+        {
+            try
+            {
+                int selection = Convert.ToInt32(input);
+                if (selection > modeList.Length || selection <= 0)
+                {
+                    Terminal.WriteLine("Error 001: " + input + " is OutOfBounds");
+                }
+                else
+                {
+                    this.level = selection;
+                }
+            }
+            catch (FormatException fe)
+            {
+                Terminal.WriteLine("Invalid Input!");
+                print(fe.ToString());
+            }
+        }
 
-            if(selection > modeList.Length || selection <= 0)
-            {
-                Terminal.WriteLine("Error 001: " + input + " is OutOfBounds");
-            }
-            else
-            {
-                
-            }
-        }
-        catch(FormatException fe)
-        {
-            Terminal.WriteLine("Invalid Input!");
-            print(fe.ToString());
-        }
     }
 }
