@@ -20,9 +20,9 @@ public class Hacker : MonoBehaviour
                                  "Huddersfield Town Hall", // medium mode
                                  "MI5 - Hidden Terminal" }; // hard mode
 
-    private string[] easyPasswords = { "module" };
-    private string[] midPasswords = { "mayoral" };
-    private string[] hardPasswords = { "anthropoid" };
+    private string[] easyPasswords = { "module", "books", "lecture", "project", "curriculum" };
+    private string[] midPasswords = { "mayoral", "municipality", "council", "metropolitan", "senate" };
+    private string[] hardPasswords = { "anthropoid", "blechley", "valkyrie", "azorian", "walther" };
 
     // Current Game State
     public int level;
@@ -137,18 +137,21 @@ public class Hacker : MonoBehaviour
     void SetAnswer()
     {
         System.Random rnd = new System.Random();
-
+   
         if (this.level == 1)
         {
-            this.answer = easyPasswords[0];
+            int index = rnd.Next(easyPasswords.Length);
+            this.answer = easyPasswords[index];
         }
         else if (this.level == 2)
         {
-            this.answer = midPasswords[0];
+            int index = rnd.Next(midPasswords.Length);
+            this.answer = midPasswords[index];
         }
         else
         {
-            this.answer = hardPasswords[0];
+            int index = rnd.Next(hardPasswords.Length);
+            this.answer = hardPasswords[index];
         }
     }
 
